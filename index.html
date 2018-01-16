@@ -12,8 +12,8 @@
 
         <style>
             body {
-              background: #000000;
-              color:#cccccc;
+              background: #ffffff;
+              color:#000000;
               margin: 0px;
               padding: 0px;
               border: 0px;
@@ -59,6 +59,10 @@
             {
                  text-align: center;
             }
+			div.Label {
+			   display: inline-block;
+			   width: 125px;
+			}
             /* END - Login Dialog Box */
             :-webkit-full-screen {
                width: 100%;
@@ -76,8 +80,46 @@
         </div>
 
         <script type="text/javascript" src="html5game/VitkaCasino777.js?GDEYB=421575195"></script>
-        <hr>
-        <b>Changelog:</b>
-        <i>- 0.000.001a: первый запуск в режиме тестирования;
+		
+		<hr>
+		
+		<fieldset>
+			<legend>История обновлений</legend>
+			<table width="100%" cellspacing="0" cellpadding="5">
+				<tr> 
+				<td width="20px" valign="top">
+				<form name="verList">
+					<select name="verID" size="4" width="20px">
+						<option value="ver1">v 0.000.001a</option>
+						<option value="ver2" selected="selected">v 0.000.001b</option>
+						<option value="ver3" disabled>v 0.000.002x</option>
+					</select>
+				</form>
+				</td>
+				<td valign="top"><div id="verText"></div></td>
+				</tr>
+			</table>
+		</fieldset>
+		<script>
+			var verSel = verList.verID; 
+			function chgVersion(){
+				 
+				var verText = document.getElementById("verText");
+				var verSelect = verSel.options[verSel.selectedIndex];
+				// verText.textContent = "Вы выбрали: " + verSelect.text;
+				var newline = String.fromCharCode(13);
+				switch (verSel.selectedIndex) {
+					case 0: 
+						verText.innerText = "- Приложение запущено в режиме тестирования\r\n";
+					break;
+					case 1:
+						verText.innerText =  "- Исправлены ошибки с отсутствие звука\r\n";
+						verText.innerText += "- Добавлена история изменений"
+					break;
+				}
+			}
+			verSel.addEventListener("change", chgVersion);
+			chgVersion();
+		</script>
     </body>
 </html>
