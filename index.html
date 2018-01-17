@@ -124,19 +124,19 @@
 			chgVersion();
 		</script>
 
-		<script type="text/javascript"> 
-		  VK.init(function() { 
-			 // VK.callMethod("showSettingsBox", 8214);
-			 
-			 VK.Widgets.Comments("vk_commentz", {limit: 10, width: '620', attach: '*', pageUrl: "https://vk.com/app6331411"});
-		  }, function() { 
-			 // API initialization failed 
-			 // Can reload page here 
-		}, '5.69'); 
-		</script>
-		
 		<br>
 		
-		<div id="vk_comments"></div>
+		<script type="text/javascript">
+		  VK.init({ apiId: 6331411, onlyWidgets: true });
+		</script>
+		
+		<div id="vk_commentz"></div>
+		<script type="text/javascript">
+			VK.init(function() { 
+				 VK.Widgets.Comments("vk_commentz", {limit: 10, width: '620', attach: '*', pageUrl: "https://vk.com/app6331411"});
+			  }, function() { 
+				// if error
+			}, '5.69'); 
+		</script>
     </body>
 </html>
