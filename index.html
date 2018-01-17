@@ -18,6 +18,12 @@
               padding: 0px;
               border: 0px;
             }
+			vk_comments { 
+				border:2px solid #ccc; 
+				width:620px; 
+				height: 300px; 
+				overflow-y: scroll; 
+			}
             canvas {
                       image-rendering: optimizeSpeed;
                       -webkit-interpolation-mode: nearest-neighbor;
@@ -126,7 +132,7 @@
 
 		<br>
 		
-		<div id="vk_comments" width="620" height="300"></div>
+		<div id="vk_comments"></div>
 		<script type="text/javascript" language="javascript">
 			VK.Widgets.Comments('vk_comments', {limit: 3, width: '620', attach: '*', pageUrl: "https://vk.com/app6331411"});
 		</script>
