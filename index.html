@@ -1,144 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta http-equiv="pragma" content="no-cache"/>
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name ="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta charset="utf-8"/>
-
-        <title>VitkaCasino777 - alpha 0.000.001a</title>
-
-        <style>
-            body {
-              background: #ffffff;
-              color:#000000;
-              margin: 0px;
-              padding: 0px;
-              border: 0px;
-            }
-			.vk_comments { 
-				border:2px solid #ccc; 
-				width:620px; 
-				height: 300px; 
-				overflow-y: scroll; 
-			}
-            canvas {
-                      image-rendering: optimizeSpeed;
-                      -webkit-interpolation-mode: nearest-neighbor;
-                      -ms-touch-action: none;
-                      margin: 0px;
-                      padding: 0px;
-                      border: 0px;
-            }
-            :-webkit-full-screen #canvas {
-                 width: 100%;
-                 height: 100%;
-            }
-            div.gm4html5_div_class
-            {
-              margin: 0px;
-              padding: 0px;
-              border: 0px;
-            }
-            /* START - Login Dialog Box */
-            div.gm4html5_login
-            {
-                 padding: 20px;
-                 position: absolute;
-                 border: solid 2px #000000;
-                 background-color: #404040;
-                 color:#00ff00;
-                 border-radius: 15px;
-                 box-shadow: #101010 20px 20px 40px;
-            }
-            div.gm4html5_cancel_button
-            {
-                 float: right;
-            }
-            div.gm4html5_login_button
-            {
-                 float: left;
-            }
-            div.gm4html5_login_header
-            {
-                 text-align: center;
-            }
-			div.Label {
-			   display: inline-block;
-			   width: 125px;
-			}
-            /* END - Login Dialog Box */
-            :-webkit-full-screen {
-               width: 100%;
-               height: 100%;
-            }
-        </style>
-    </head>
-
-    <body>
-		<script src="https://vk.com/js/api/xd_connection.js?2"  type="text/javascript"></script>
+<html lang="ru">
+	<head>
+		<title>Informatics Helper</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+	</head>
+	<body>
+		<h1>RLE Coding Helper</h1>
 		
-		<script type="text/javascript" language="javascript">
-			VK.callMethod("resizeWindow", 620, 2000);
-		</script>
+		<center>
+			<textarea rows="10" cols="100" id="RLECOD_inp" placeholder="Введите текст используя таблицу CP1251"></textarea>
+			<br>
+			<input width="50%" type="button" id="RLECOD_do" value="Выполнить кодирование методом RLE"/>
+			<br>
+			<input width="50%" type="button" id="RLECOD_8bl" value="Расшифровать двоичный код (8bit-len)"/>
+			<br>
+			<textarea rows="10" cols="100" id="RLECOD_res" placeholder="Здесь будет сформирована таблица-ответ" readonly></textarea>
+		</center>
 		
-        <div class="gm4html5_div_class" id="gm4html5_div_id">
-
-            <canvas id="canvas" width="620" height="620">
-               <p>Your browser doesn't support HTML5 canvas.</p>
-            </canvas>
-        </div>
-
-        <script type="text/javascript" src="html5game/VitkaCasino777.js?GDEYB=421575195"></script>
-		
-		<hr>
-		
-		<fieldset>
-			<legend>История обновлений</legend>
-			<table width="100%" cellspacing="0" cellpadding="5">
-				<tr> 
-				<td width="20px" valign="top">
-				<form name="verList">
-					<select name="verID" size="4" width="20px">
-						<option value="ver1">v 0.000.001a</option>
-						<option value="ver2" selected="selected">v 0.000.001b</option>
-						<option value="ver3" disabled>v 0.000.002x</option>
-					</select>
-				</form>
-				</td>
-				<td valign="top"><div id="verText"></div></td>
-				</tr>
-			</table>
-		</fieldset>
 		<script>
-			var verSel = verList.verID; 
-			function chgVersion(){
-				 
-				var verText = document.getElementById("verText");
-				var verSelect = verSel.options[verSel.selectedIndex];
-				// verText.textContent = "Вы выбрали: " + verSelect.text;
-				var newline = String.fromCharCode(13);
-				switch (verSel.selectedIndex) {
-					case 0: 
-						verText.innerText = "- Приложение запущено в режиме тестирования\r\n";
-					break;
-					case 1:
-						verText.innerText =  "- Исправлены ошибки с отсутствие звука\r\n";
-						verText.innerText += "- Добавлена история изменений"
-					break;
-				}
-			}
-			verSel.addEventListener("change", chgVersion);
-			chgVersion();
-		</script>
+			var cp1251table = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", 
+								"-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-",
+								" ", "!", "\"", "#", "$", "%", "&", "\'", "(", ")", "*", "+", ",", "-", ".", "/",
+								"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ":", ";", "<", "=", ">", "?",
+								"@", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O",
+								"P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "[", "\\","]", "^", "_",
+								"`", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o",
+								"p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "{", "|", "}", "~", "DEL",
+								"Ђ", "Ѓ", "‚", "ѓ", "„", "…", "†", "‡", "€", "‰", "Љ", "‹", "Њ", "Ќ", "Ћ", "Џ",
+								"ђ", "‘", "’", "“", "”", "•", "–", "—", "Не определена", "™", "љ", "›", "њ", "ќ", "ћ", "џ",
+								" ", "Ў", "ў", "Ј", "¤", "Ґ", "¦", "§", "Ё", "©", "Є", "«", "¬", "-Ї", "®","Ї",
+								"°", "±", "І", "і", "ґ", "µ", "¶", "·", "ё", "№", "є", "»", "ј", "Ѕ", "ѕ", "ї",
+								"А", "Б", "В", "Г", "Д", "Е", "Ж", "З", "И", "Й", "К", "Л", "М", "Н", "О", "П",
+								"Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я",
+								"а", "б", "в", "г", "д", "е", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п",
+								"р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я" ]
+			var inp = document.getElementById('RLECOD_inp');
+			var but = document.getElementById('RLECOD_do');
+			var res = document.getElementById('RLECOD_res');
+			var but8 = document.getElementById('RLECOD_8bl');
 
-		<br>
-		
-		<div id="vk_comments"></div>
-		<script type="text/javascript" language="javascript">
-			VK.Widgets.Comments('vk_comments', {limit: 3, width: '620', attach: '*', pageUrl: "https://vk.com/app6331411"});
+			function setText(newText) { res.value = newText; }
+			function decToTwo(decNum) { 
+				if (decNum < 0 || decNum > 255) return -1;
+				var twoText = "";
+				var twoCoun = 0;
+				for(var i = 7; i >= 0; i --) {
+					if ( (Math.pow(2, i) + twoCoun) <= decNum ) {
+						twoCoun += Math.pow(2, i);
+						twoText += "1";
+					} else twoText += "0";
+				}
+				return twoText;
+			}
+			function twoToDec(twoNum) {
+				var twoText = 0;
+				for(var i = 0; i < 8; i ++) {
+					twoText += Math.pow(2, i) * twoNum[7-i];
+				}
+				return twoText;
+			}
+			function twoToSym(twoNum) {
+				return cp1251table[twoToDec(twoNum)];
+			}
+			function symToDec(symBol) {
+				for(var i = 0; i <= cp1251table.length; i ++) {
+					if (cp1251table[i] == symBol) return i;
+				}
+				return -1;
+			}
+			function symToTwo(symBol) { return decToTwo(symToDec(symBol)); }
+			but8.onclick = function() {
+				var resultConvert = "";
+				var twt = "";
+				if(inp.value.length % 8 != 0) {
+					resultConvert = "Ошибка. Введите 8-битный двоичный код без пробелов";
+				} else {
+					resultConvert = "";
+					for(var i = 0; i < (inp.value.length / 8); i ++) {
+						twt = inp.value.substring(8*i, 8*(i+1));
+						resultConvert = resultConvert + " " + twt + "\t" + twoToDec(twt) + "\t" + twoToSym(twt) + "\n";
+ 					}
+				}
+				setText(resultConvert);
+			}
+			but.onclick = function() {
+				var resultConvert = "";
+				var Asym = [];
+				var Adec = [];
+				var Atwo = [];
+				var Azip = [];
+				for(var i = 0; i < inp.value.length; i ++) {
+					Asym.push(inp.value[i]);
+					Adec.push(symToDec(inp.value[i]));
+					Atwo.push(symToTwo(inp.value[i]));
+				}
+				
+				
+				var i = 1;
+				var dStart = 0;
+				var dMode = 0;
+				var wordlist = "5 ";
+				if(Asym[0] == Asym[1]) dMode = 1;
+				while(i < inp.value.length-2) {
+					if(inp.value[i-1] == inp.value[i] && dMode == 0) {
+						worldlist = wordlist + inp.value.substring(dStart, i-2) + "\n";
+						dStart = i - 1;
+						i = i - 1;
+						dMode = 1;
+					} 
+					else if(inp.value[i-1] != inp.value[i] && dMode == 1) {
+						wordlist = wordlist + inp.value.substring(dStart, i) + "\n";
+						if(inp.value[i] == inp.value[i+1]) dMode = 1;
+						else dMode = 0;
+						dStart = i + 1;
+					}
+					
+					i ++;
+				}
+				setText(" 5 " + wordlist);
+				
+	
+				/* -- while(i < Asym.length-1) {
+					if(dMode == 0) {
+						if(Asym[i-1] == Asym[i]) { dMode = 1; }
+						else if(Asym[i-1] != Asym[i]) { dMode = 2; }
+					} else if(dMode == 1) {
+						if(Asym[i-1] != Asym[i]) {
+							// saveblock (dStart, i-1)
+							i -= 2;
+							dOne += 1;
+							dStart = i;
+						}
+					} else {
+						if(Asym[i-1] == Asym[i]) {
+							// saveblock (dStart, i-2)
+							i -= 3;
+							dTwo += 1;
+							dStart = i-1;
+						}
+					}
+					i ++;
+					// Azip.push();
+				} --*/
+				
+				for(var i = 0; i < Asym.length; i ++) { 
+					resultConvert += Adec[i] + "\t" + Asym[i] + "\t" + Atwo[i] + "\n";
+				}
+				setText(resultConvert);
+			}
 		</script>
-    </body>
+	</body>
 </html>
