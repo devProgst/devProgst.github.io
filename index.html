@@ -1,22 +1,44 @@
 <!DOCTYPE html>
 <html lang="ru">
 	<head>
-		<title>Informatics Helper</title>
+		<title>PROGST Helper</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="style.css" rel="stylesheet">
 	</head>
 	<body>
-		<h1>RLE Coding Helper</h1>
-		
-		<center>
-			<textarea rows="10" cols="100" id="RLECOD_inp" placeholder="Введите текст используя таблицу CP1251"></textarea>
-			<br>
-			<input width="50%" type="button" id="RLECOD_do" value="Выполнить кодирование методом RLE"/>
-			<br>
-			<input width="50%" type="button" id="RLECOD_8bl" value="Расшифровать двоичный код (8bit-len)"/>
-			<br>
-			<textarea rows="10" cols="100" id="RLECOD_res" placeholder="Здесь будет сформирована таблица-ответ" readonly></textarea>
-		</center>
+		<header>
+			<center> <img src="img\header.png" alt="PLH Logo"> </center>
+		</header>
+		<article>
+			
+			<div class="wrapper_body">
+				 <div class="cbm_wrap ">
+					 <h1>Работа с текстом</h1>
+					 <br>
+					 <p>Введите исходный текст в поле ввода ниже:</p>
+					 <br>
+					 <center>
+						 <textarea id="WT_inp" rows="10" cols="100" placeholder="Введите текст используя таблицу CP1251"></textarea>
+						 <br>
+						 <a href="#" class="button" id="WT_TtoC">Разобрать ТЕКСТ по таблице CP-1251</a>
+						 <a href="#" class="button" id="WT_BtoT">Из ДВОИЧНОЙ последовательности в ТЕКСТ</a>
+						 <br>
+						 <table id="WT_ans">
+							<tr>
+								<th>Открытый текст</th>
+								<th>Десятичный код (CP-1251)</th>
+								<th>Двоичный код</th>
+							</tr>
+						 </table>
+					 </center>
+				 </div>
+			</div>
+			
+		</article>
+		<footer id="btmdata">
+				<font size="2">Copyright © Progst 2018</font>
+		</footer>
 		
 		<script>
 			var cp1251table = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", 
@@ -35,120 +57,77 @@
 								"Р", "С", "Т", "У", "Ф", "Х", "Ц", "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь", "Э", "Ю", "Я",
 								"а", "б", "в", "г", "д", "е", "ж", "з", "и", "й", "к", "л", "м", "н", "о", "п",
 								"р", "с", "т", "у", "ф", "х", "ц", "ч", "ш", "щ", "ъ", "ы", "ь", "э", "ю", "я" ]
-			var inp = document.getElementById('RLECOD_inp');
-			var but = document.getElementById('RLECOD_do');
-			var res = document.getElementById('RLECOD_res');
-			var but8 = document.getElementById('RLECOD_8bl');
+			var WTinp = document.getElementById('WT_inp');
+			var WTbutTtoC = document.getElementById('WT_TtoC');
+			var WTbutBtoT = document.getElementById('WT_BtoT');
+			var WTans = document.getElementById('WT_ans');
 
-			function setText(newText) { res.value = newText; }
-			function decToTwo(decNum) { 
-				if (decNum < 0 || decNum > 255) return -1;
-				var twoText = "";
-				var twoCoun = 0;
-				for(var i = 7; i >= 0; i --) {
-					if ( (Math.pow(2, i) + twoCoun) <= decNum ) {
-						twoCoun += Math.pow(2, i);
-						twoText += "1";
-					} else twoText += "0";
+			var TYPE_2TO10 = 0;
+			var TYPE_2TOCP = 1;
+			var TYPE_10TO2 = 2;
+			var TYPE_10TOCP = 3;
+			var TYPE_CPTO2 = 4;
+			var TYPE_CPTO10 = 5;
+			
+			function convert(inpp, type) {
+				var answer = '';
+				if (type == TYPE_2TO10) {
+					answer = 0;
+					for(var i = 0; i < 8; i ++) answer += Math.pow(2, i) * inpp[7-i];
+				} else if (type == TYPE_2TOCP) {
+					answer = cp1251table[convert(inpp, TYPE_2TO10)];
+				} else if (type == TYPE_10TO2) {
+					if(inpp < 0 || inpp > 255) answer = -1;
+					else {
+						var tempt = 0;
+						for(var i = 7; i >= 0; i --) if( (Math.pow(2, i) + tempt) <= inpp ) { tempt += Math.pow(2, i); answer += "1"; } else answer += "0";
+					}
+				} else if (type == TYPE_10TOCP) {
+					answer = cp1251table[inpp];
+				} else if (type == TYPE_CPTO2) {
+					answer = convert(convert(inpp, TYPE_CPTO10), TYPE_10TO2);
+				} else if (type == TYPE_CPTO10) {
+					for(var i = 0; i <= cp1251table.length; i ++)
+						if (cp1251table[i] == inpp) {  answer = i; break; }
+				} else answer = ' - ';
+				return answer;
+			}
+		
+			function setText(newText) { WTans.value = newText; }
+			function clearTable() { while(WTans.rows.length > 1) WTans.deleteRow(1); }
+			
+			WTbutTtoC.onclick = function() {
+				//var ansMsg = '';
+				//ansMsg = 'kek';
+				clearTable();
+				for(var i = 0; i < WTinp.value.length; i ++) {
+					var row = WTans.insertRow(-1);
+					var celTXT = row.insertCell(0); celTXT.innerHTML = WT_inp.value[i];
+					var celDEC = row.insertCell(1); celDEC.innerHTML = convert(WT_inp.value[i], TYPE_CPTO10);
+					var celTWO = row.insertCell(2); celTWO.innerHTML = convert(WT_inp.value[i], TYPE_CPTO2);
 				}
-				return twoText;
 			}
-			function twoToDec(twoNum) {
-				var twoText = 0;
-				for(var i = 0; i < 8; i ++) {
-					twoText += Math.pow(2, i) * twoNum[7-i];
-				}
-				return twoText;
-			}
-			function twoToSym(twoNum) {
-				return cp1251table[twoToDec(twoNum)];
-			}
-			function symToDec(symBol) {
-				for(var i = 0; i <= cp1251table.length; i ++) {
-					if (cp1251table[i] == symBol) return i;
-				}
-				return -1;
-			}
-			function symToTwo(symBol) { return decToTwo(symToDec(symBol)); }
-			but8.onclick = function() {
-				var resultConvert = "";
-				var twt = "";
-				if(inp.value.length % 8 != 0) {
-					resultConvert = "Ошибка. Введите 8-битный двоичный код без пробелов";
+			
+			WTbutBtoT.onclick = function() {
+				clearTable();
+				var answer = "";
+				if (WTinp.value.length < 1 || WTinp.value.length % 8 != 0) {
+					var row = WTans.insertRow(-1);
+					row.insertCell(0);
+					var cel = row.insertCell(1); 
+					row.insertCell(2);
+					cel.innerHTML = 'Произошла ошибка декодирования данных';
 				} else {
-					resultConvert = "";
-					for(var i = 0; i < (inp.value.length / 8); i ++) {
-						twt = inp.value.substring(8*i, 8*(i+1));
-						resultConvert = resultConvert + " " + twt + "\t" + twoToDec(twt) + "\t" + twoToSym(twt) + "\n";
- 					}
-				}
-				setText(resultConvert);
-			}
-			but.onclick = function() {
-				var resultConvert = "";
-				var Asym = [];
-				var Adec = [];
-				var Atwo = [];
-				var Azip = [];
-				for(var i = 0; i < inp.value.length; i ++) {
-					Asym.push(inp.value[i]);
-					Adec.push(symToDec(inp.value[i]));
-					Atwo.push(symToTwo(inp.value[i]));
-				}
-				
-				
-				var i = 1;
-				var dStart = 0;
-				var dMode = 0;
-				var wordlist = "5 ";
-				if(Asym[0] == Asym[1]) dMode = 1;
-				while(i < inp.value.length-2) {
-					if(inp.value[i-1] == inp.value[i] && dMode == 0) {
-						worldlist = wordlist + inp.value.substring(dStart, i-2) + "\n";
-						dStart = i - 1;
-						i = i - 1;
-						dMode = 1;
-					} 
-					else if(inp.value[i-1] != inp.value[i] && dMode == 1) {
-						wordlist = wordlist + inp.value.substring(dStart, i) + "\n";
-						if(inp.value[i] == inp.value[i+1]) dMode = 1;
-						else dMode = 0;
-						dStart = i + 1;
+					for(var i = 0; i < (WTinp.value.length / 8); i ++) {
+						answer = WTinp.value.substring( (8*i), (8*(i+1)) );
+						var row = WTans.insertRow(-1);
+						var celTXT = row.insertCell(0); celTXT.innerHTML = answer;
+						var celDEC = row.insertCell(1); celDEC.innerHTML = convert(answer, TYPE_2TO10);
+						var celTWO = row.insertCell(2); celTWO.innerHTML = convert(answer, TYPE_2TOCP);
 					}
-					
-					i ++;
 				}
-				setText(" 5 " + wordlist);
-				
-	
-				/* -- while(i < Asym.length-1) {
-					if(dMode == 0) {
-						if(Asym[i-1] == Asym[i]) { dMode = 1; }
-						else if(Asym[i-1] != Asym[i]) { dMode = 2; }
-					} else if(dMode == 1) {
-						if(Asym[i-1] != Asym[i]) {
-							// saveblock (dStart, i-1)
-							i -= 2;
-							dOne += 1;
-							dStart = i;
-						}
-					} else {
-						if(Asym[i-1] == Asym[i]) {
-							// saveblock (dStart, i-2)
-							i -= 3;
-							dTwo += 1;
-							dStart = i-1;
-						}
-					}
-					i ++;
-					// Azip.push();
-				} --*/
-				
-				for(var i = 0; i < Asym.length; i ++) { 
-					resultConvert += Adec[i] + "\t" + Asym[i] + "\t" + Atwo[i] + "\n";
-				}
-				setText(resultConvert);
 			}
+
 		</script>
 	</body>
 </html>

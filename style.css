@@ -1,0 +1,113 @@
+body {
+  background-color: #eee;
+  background-image: url(img/bcg.bmp);
+  background-repeat:repeat;
+}
+
+#btmdata {
+	position:absolute;
+	bottom: 5px;
+	padding: 5px;
+	margin: 4px;
+	opacity: 0.132;
+}
+   
+.wrapper_body {
+    position: absolute;
+    padding: 10px 0;
+    font-size: 15px;
+    font-family: 'Open Sans', sans-serif;
+    color: #4A4A4A;
+    text-align: center;
+	width: 95%
+}
+.cbm_wrap {
+	background-image: url(img/bcb.bmp);
+    margin: 20px auto;
+    display: block;
+    width: 70%;
+	height: auto;
+    padding:20px;
+    border-radius: 2px 2px 2px 2px;
+    -webkit-box-shadow: 0 1px 4px
+     rgba(0, 0, 0, 0.3), 0 0 40px
+     rgba(0, 0, 0, 0.1) inset;
+    -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 0, 0, 0.1) inset;    box-shadow: 0 1px 4px
+     rgba(0, 0, 0, 0.3), 0 0 40px
+     rgba(0, 0, 0, 0.1) inset;
+}
+.cbm_wrap img {
+    width: auto;
+    margin-top: 5px;
+}
+.cbm_wrap p{ 
+    margin-top: 8px !important;
+    text-align: justify !important;
+}
+.cbm_wrap h1{
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 5px; 
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+}
+.cbm_wrap a{
+    text-decoration: none;
+    color: #4A4A4A !important;
+}
+.cbm_wrap a:hover{
+    text-decoration: underline;
+    color: #6B6B6B !important ;
+}
+.cbm_wrap textarea {
+	resize: vertical;
+	width: 80%;
+}
+
+.cbm_wrap a.button {
+	display: inline-block;
+	color: white;
+	background-image: url(img/butbg.bmp);
+	font-weight: 700;
+	text-decoration: none;
+	user-select: none;
+	padding: .5em 2em;
+	outline: none;
+	border: 2px solid;
+	border-radius: 1px;
+	transition: 0.2s;
+}
+.cbm_wrap a.button:hover { 
+	background-image: url(img/butbgh.bmp);
+}
+.cbm_wrap a.button:active { 
+	background-image: url(img/butbga.bmp);
+}
+
+.cbm_wrap table {
+	border:2px solid #5CB;
+	border-collapse:collapse;
+	width:80%;
+	text-align: center;
+}
+
+.cbm_wrap table th {
+	padding: 5px 0;
+    line-height: 1.5;
+	background:#5CB;
+	color: #EEE;
+}
+
+.cbm_wrap table tr {
+	color: #333;
+	background: #DEE; 
+}
+
+.cbm_wrap table tr:nth-child(even){
+	color: #333;
+	background: #CEE;
+}
+
+.cbm_wrap table tr:hover {
+	color: #444;
+	background: #5CB;
+}
