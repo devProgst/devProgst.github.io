@@ -10,7 +10,10 @@ local dlstatus = require('moonloader').download_status
 require "lib.moonloader"
 require "lib.sampfuncs"
 
-local VERSION = "1"
+local UPDATE_THREAD = nil
+local VERSION = "1.1"
+local ACTUAL = VERSION
+local download_id = nil
 
 local DS_MSGBOX = 0
 local DS_INPUT = 1
@@ -24,6 +27,8 @@ local dlgCMDS	= 301
 local dlgSETLIST = 302
 local dlgSETUP = 303
 local dlgEXTRA = 304
+local dlgSCROPT = 305
+local dlgUPDATE = 333
 
 local config = {
 	main = {
@@ -38,8 +43,14 @@ local config = {
 		cuff = false,
 		follow = false,
 		tocar = false
+	},
+	other = {
+		timestamp = false,
+		updating = false
 	}
 }
+
+local scriptLoadingIntro = false
 local scriptENTERDATA = false
 local scriptTEMPSETID = 0
 local scriptAUTODUB = false
@@ -51,16 +62,35 @@ local scriptSHOWMEDOCS = false
 local scriptGOTOID, scriptGOTOMODE = -1, false
 
 function download_handler(id, status, p1, p2)
-	if stop_downloading then
-		stop_downloading = false
+  if stop_downloading then
+    stop_downloading = false
+    download_id = nil
+    printStyledString('Loading canceled', 2000, 4)
+    return false -- прервать загрузку
+  end
+  if status == dlstatus.STATUS_DOWNLOADINGDATA then
+    printStyledString(string.format('Loaded %d from %d.', p1, p2), 2000, 4)
+  elseif status == dlstatus.STATUS_ENDDOWNLOADDATA then
+    printStyledString('Loading done', 2000, 4)
 		download_id = nil
-		printStyledString("~r~Download canceled", 2500, 4)
-		return false -- прервать загрузку
-	end
-	if status == dlstatus.STATUS_DOWNLOADINGDATA then
-		printStyledString(string.format("Downloading files...~n~~w~%d ~b~/ ~w~%d", p1, p2), 1000, 4)
-	elseif status == dlstatus.STATUS_ENDDOWNLOADDATA then
-		printStyledString("Download is ~g~OK", 2500, 4)
+  end
+end
+
+function update()
+	tickCount = 0
+	scr_width, scr_height = getScreenResolution()
+	local font_flag = require('moonloader').font_flag
+	local my_font = renderCreateFont('Verdana', 12, font_flag.BOLD + font_flag.SHADOW)
+	local nickf, nickname, nickid
+	while true do
+		wait(1)
+		if config.other.timestamp then
+			nickf, nickid = sampGetPlayerIdByCharHandle(playerPed)
+			if nickf then nickname = sampGetPlayerNickname(nickid)
+			else nickid = -1; nickname = ""
+			end
+			renderFontDrawText(my_font, "{CCFFFFFF}" .. nickname .. "[" .. nickid .. "]\n[ " .. os.date("%d.%m.%Y | %H:%M:%S") .. " ]", scr_width - #nickname * 15, scr_height - 45, 0xFFFFFFFF)
+		end
 	end
 end
 
@@ -69,7 +99,7 @@ function main()
 	if not isSampLoaded() then return end
 	if not isSampfuncsLoaded() then return end
 	while not sampIsLocalPlayerSpawned() do wait(2500) end
-	loadingScreen()
+	if scriptLoadingIntro then loadingScreen() end
 	loadConfigs()
 
 	-- Register Commands -- -- --------------------
@@ -86,8 +116,8 @@ function main()
 	sampRegisterChatCommand("arr", cmdArrest); sampRegisterChatCommand("arrest", cmdArrest);
 	sampRegisterChatCommand("tim", cmdTime)
 
-	-- downloadUrlToFile('https://github.com/devProgst/devProgst.github.io/blob/master/version.txt', getWorkingDirectory())
-	tryToUpdateScript()
+  -- Script Code Start
+	UPDATE_THREAD = lua_thread.create(update)
 
 	while true do
 		wait(0)
@@ -266,6 +296,11 @@ function loadConfigs()
 			#config.main.lname == 0 or
 			#config.main.rang == 0) then scriptENTERDATA = true
 	else scriptENTERDATA = false end
+	if config.other.updating == true then
+		config.other.updating = false
+		showDlg(dlgUPDATE)
+		saveConfigs()
+	end
 end
 
 function saveConfigs()
@@ -277,11 +312,44 @@ function saveConfigs()
 	else scriptENTERDATA = false end
 end
 
-function tryToUpdateScript()
-	local url = 'https://github.com/devProgst/devProgst.github.io/blob/master/rasistHelper.lua'
-	local file_path = getWorkingDirectory() -- .. '/downloads/file.dat'
-	download_id = downloadUrlToFile(url, file_path, download_handler)
-	-- VERSION
+function tryToUpdateScript(onlyVersion)
+	if onlyVersion == true then
+		local url = 'https://raw.githubusercontent.com/devProgst/devProgst.github.io/master/version.txt'
+		local file_path = getWorkingDirectory() .. '/downloads/file.txt'
+		download_id = downloadUrlToFile(url, file_path, download_handler)
+
+		local downloadTries = 0
+		while download_id ~= nil do
+			wait(300)
+			downloadTries = downloadTries + 1; if downloadTries > 10 then download_stop = true break end
+		end
+
+		local fv = io.open(file_path, "r")
+		if (fv) then
+		  local tempver = fv:read()
+			if string.find(tempver, "!SCRIPT_VERSION_PREFIX! v. ") then
+				local sssss, eeeee = string.find(tempver, "v. ")
+				ACTUAL = string.sub(tempver, sssss + 3)
+			else ACTUAL = VERSION
+			end
+			fv:close()
+		end
+	else
+		config.other.updating = true
+		saveConfigs()
+		wait(500)
+
+		local url = 'https://raw.githubusercontent.com/devProgst/devProgst.github.io/master/rasistHelper.lua'
+		local file_path = getWorkingDirectory() .. '/rasistHelper.lua'
+		download_id = downloadUrlToFile(url, file_path, download_handler)
+		local ff = io.open(file_path, "r")
+
+		local downloadTries = 0
+		while download_id ~= nil do
+			wait(300)
+			downloadTries = downloadTries + 1; if downloadTries > 10 then break end
+		end
+	end
 end
 
 -- -- Commands -- -- ---------------------------------
@@ -325,7 +393,7 @@ function showDlg(dialogid)
 	if(dialogid == dlgMAIN) then
 		if (scriptENTERDATA == true) then return showDlg(dlgSETLIST) end
 		dcap = "{00BFFF}Главное меню Помощника Василия"; dbut1 = "Выбрать"; dbut2 = "Закрыть"; dtyp = DS_LIST
-		dcon = dcon .. "1. Список команд\n2. Настройки\n3. Служебные настройки"
+		dcon = dcon .. "1. Список команд\n2. Настройки персонажа\n3. Автоматические отыгровки\n4. Настройки скрипта\n{CCCCCC}5. Обновление"
 	elseif (dialogid == dlgCMDS) then
 		dcap = "{00BFFF}Список команд"; dbut1 = "Назад"; dbut2 = "Закрыть"; dtyp = DS_MSGBOX
 		dcon = dcon .. "{DD9955}/v (/vasya) {FFFFFF}- открыть меню помощника\n"
@@ -336,7 +404,7 @@ function showDlg(dialogid)
 		dcon = dcon .. "{DD9955}/ids {FFFFFF}- отслеживание игрока в зоне видимости\n"
 		dcon = dcon .. "{DD9955}/tim {FFFFFF}- посмотреть на часы\n"
 	elseif (dialogid == dlgSETLIST) then
-		dcap = "{00BFFF}Настройки"; dbut1 = "Изменить"; dbut2 = "Назад"; dtyp = DS_TABHEAD
+		dcap = "{00BFFF}Настройки персонажа"; dbut1 = "Изменить"; dbut2 = "Назад"; dtyp = DS_TABHEAD
 		dcon = dcon .. "параметр\tзначение\n\
 			1. Ник игрока\t" .. (#config.main.nick == 0 and "{DD2A2A}не указан" or "{84DD2A}" .. config.main.nick  ) .. "\n\
 			2. Имя\t" .. (#config.main.fname == 0 and "{DD2A2A}не указано" or "{84DD2A}" .. config.main.fname  ) .. "\n\
@@ -358,12 +426,28 @@ function showDlg(dialogid)
 			dcon = dcon .. "Мужской\nЖенский"
 		end
 	elseif (dialogid == dlgEXTRA) then
-		dcap = "{00BFFF}Служебные функции"; dbut1 = "Изменить"; dbut2 = "Назад"; dtyp = DS_TABHEAD
+		dcap = "{00BFFF}Автоматические отыгровки"; dbut1 = "Изменить"; dbut2 = "Назад"; dtyp = DS_TABHEAD
 		dcon = dcon .. "параметр\tзначение\n\
 			1. Автоматическая дубинка\t" .. (config.func.dub and "{84DD2A}вкл" or "{DD2A2A}выкл") .. "\n"
 		dcon = dcon .. "2. Отыгровка наручников (/cuff)\t" .. (config.func.cuff and "{84DD2A}вкл" or "{DD2A2A}выкл") .. "\n\
 			3. Отыгровка ведения (/hold)\t" .. (config.func.follow and "{84DD2A}вкл" or "{DD2A2A}выкл") .. "\n\
 			4. Отыгровка посадки в автомобиль (/putpl)\t" .. (config.func.tocar and "{84DD2A}вкл" or "{DD2A2A}выкл") .. "\n"
+	elseif (dialogid == dlgSCROPT) then
+		dcap = "{00BFFF}Настройки скрипта"; dbut1 = "Изменить"; dbut2 = "Назад"; dtyp = DS_TABHEAD
+		dcon = dcon .. "параметр\tзначение\n\
+			1. Отображать ник и дату\t" .. (config.other.timestamp and "{84DD2A}вкл" or "{DD2A2A}выкл")
+	elseif (dialogid == dlgUPDATE) then
+		tryToUpdateScript(true)
+		dcap = "{00BFFF}Обновление скрипта"; dtyp = DS_MSGBOX
+		dcon = dcon .. "{FFFFFF}Текущая версия: {DE4343}" .. tostring(VERSION) .. "\n"
+		dcon = dcon .. "{FFFFFF}Актуальная версия: {43DEDE}" .. tostring(ACTUAL) .. "\n\n"
+		if (VERSION ~= ACTUAL) then
+			dbut1 = "Обновить"; dbut2 = "Назад";
+			dcon = dcon .. "{FFFFFF}Нажмите кнопку {DECC43}ОБНОВИТЬ {FFFFFF}для загрузки новой версии."
+		else
+			dbut1 = "Назад"; dbut2 = "Закрыть";
+			dcon = dcon .. "{FFFFFF}У вас установлена последняя версия скрипта."
+		end
 	else dvalid = false end
 	if dvalid == true then sampShowDialog(dialogid, dcap, dcon, dbut1, dbut2, dtyp) end
 end
@@ -375,6 +459,8 @@ function onDialogRespone()
 		if dlgL == 0 then showDlg(dlgCMDS)
 		elseif dlgL == 1 then showDlg(dlgSETLIST)
 		elseif dlgL == 2 then showDlg(dlgEXTRA)
+		elseif dlgL == 3 then showDlg(dlgSCROPT)
+		elseif dlgL == 4 then showDlg(dlgUPDATE)
 		end
 	end
 
@@ -427,8 +513,32 @@ function onDialogRespone()
 		end
 	end
 
+	dlgR, dlgB, dlgL, dlgI = sampHasDialogRespond(dlgSCROPT)
+	if (dlgR == true) then
+		if (dlgB == 1) then
+			if (dlgL == 0) then config.other.timestamp = not config.other.timestamp
+			end
+			saveConfigs()
+			showDlg(dlgSCROPT)
+		else showDlg(dlgMAIN)
+		end
+	end
+
+	dlgR, dlgB, dlgL, dlgI = sampHasDialogRespond(dlgUPDATE)
+	if (dlgR == true) then
+		if (VERSION ~= ACTUAL) then
+			if (dlgB == 1) then tryToUpdateScript(false)
+			else showDlg(DLG_MAIN)
+			end
+		else
+			if (dlgB == 1) then showDlg(DLG_MAIN)
+			end
+		end
+	end
+
 end
 
+-- -- Other functions -- -- --
 function getPlaLine(strline)
 	for i = 0, 999 do
 		if sampIsPlayerConnected(i) and string.find(strline, sampGetPlayerNickname(i)) then
