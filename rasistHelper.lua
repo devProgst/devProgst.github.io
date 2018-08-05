@@ -5,8 +5,12 @@ script_version("v1")
 script_authors("Progst")
 
 local inicfg = require 'inicfg'
+local http = require 'socket.http'
+local dlstatus = require('moonloader').download_status
 require "lib.moonloader"
 require "lib.sampfuncs"
+
+local VERSION = "1"
 
 local DS_MSGBOX = 0
 local DS_INPUT = 1
@@ -46,6 +50,20 @@ local scriptSEARCHID = -1
 local scriptSHOWMEDOCS = false
 local scriptGOTOID, scriptGOTOMODE = -1, false
 
+function download_handler(id, status, p1, p2)
+	if stop_downloading then
+		stop_downloading = false
+		download_id = nil
+		printStyledString("~r~Download canceled", 2500, 4)
+		return false -- прервать загрузку
+	end
+	if status == dlstatus.STATUS_DOWNLOADINGDATA then
+		printStyledString(string.format("Downloading files...~n~~w~%d ~b~/ ~w~%d", p1, p2), 1000, 4)
+	elseif status == dlstatus.STATUS_ENDDOWNLOADDATA then
+		printStyledString("Download is ~g~OK", 2500, 4)
+	end
+end
+
 function main()
 	wait(2000)
 	if not isSampLoaded() then return end
@@ -67,6 +85,9 @@ function main()
 	sampRegisterChatCommand("ids", cmdFinder)
 	sampRegisterChatCommand("arr", cmdArrest); sampRegisterChatCommand("arrest", cmdArrest);
 	sampRegisterChatCommand("tim", cmdTime)
+
+	-- downloadUrlToFile('https://github.com/devProgst/devProgst.github.io/blob/master/version.txt', getWorkingDirectory())
+	tryToUpdateScript()
 
 	while true do
 		wait(0)
@@ -254,6 +275,13 @@ function saveConfigs()
 			#config.main.lname == 0 or
 			#config.main.rang == 0) then scriptENTERDATA = true
 	else scriptENTERDATA = false end
+end
+
+function tryToUpdateScript()
+	local url = 'https://github.com/devProgst/devProgst.github.io/blob/master/rasistHelper.lua'
+	local file_path = getWorkingDirectory() -- .. '/downloads/file.dat'
+	download_id = downloadUrlToFile(url, file_path, download_handler)
+	-- VERSION
 end
 
 -- -- Commands -- -- ---------------------------------
