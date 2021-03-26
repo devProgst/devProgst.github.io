@@ -22,6 +22,12 @@ body {
 	}
 }
 
+@media only screen and (max-width : 550px) {
+	.helpBlock img {
+		width: 100% !important;
+	}
+}
+
 .helpBlock {
 	display: block;
 	margin: 20pt auto;
