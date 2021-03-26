@@ -26,6 +26,10 @@ body {
 	.helpBlock img {
 		width: 100% !important;
 	}
+	
+	.helpBlock .mAnswer {
+		font-size: 15pt;
+	}
 }
 
 .helpBlock {
@@ -89,12 +93,13 @@ body {
 }
 
 .mCorrect {
-	color: rgba(50,140,0,1.00);
+	color: #00ed00;
+	text-shadow: #063d06 2px 2px 2px;
 	font-weight: bold;
 }
 
 .mIncorrect {
-	color: rgba(255,0,4,0.25);
+	color: #4a0a0aaa;
 	text-decoration: line-through;
 }
 
