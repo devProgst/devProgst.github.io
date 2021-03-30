@@ -26,6 +26,11 @@
 					</tr>
 				</table>
 				<p id="mAns" class="mAnswer">Вы ещё не запрашивали поиск вопроса.</p>
+				<hr>		
+				<details id="mFQLload">
+					<summary>Просмотр полного списка вопросов.</summary>
+					<div id="mFQL">Загрузка...</div>
+				</details>
 			</center>
 		</div>
 		
@@ -359,6 +364,10 @@
 			var mAtxt = document.getElementById("mAT");
 			var mAnswer = document.getElementById("mAns");
 			
+			var mQListLoaded = false;
+			var mQListObj = document.getElementById("mFQLload");
+			var mQList = document.getElementById("mFQL");
+			
 			mAnum.onclick = function() {
 				/*mAnswer.innerHTML = mQnum.value;*/
 				if (mQnum.value.length > 0) updateAnswer(0, mQnum.value);
@@ -368,6 +377,36 @@
 				/*mAnswer.innerHTML = mQtxt.value;*/
 				if (mQtxt.value.length > 0) updateAnswer(1, mQtxt.value);
 			}
+			
+			mQListObj.onclick = function() {
+				if (mQListLoaded == false) {
+					mQListLoaded = true;
+					let lmql = "";
+					for(var i = 0; i < maratAnswers.length; i ++) {
+						lmql = lmql + "<div class='mQuestion'><div class='mQueTxt'>" + maratAnswers[i][0] + "</div><table>";
+						for (var n = 0; n < maratAnswers[i][1].length; n ++) {
+							lmql = lmql + "<tr><td" + 
+								(maratAnswers[i][1][n][0] == "+" ? 
+								 	(" class='mAnsOk'>" + maratAnswers[i][1][n].substr(1)) : 
+								 	(">" + maratAnswers[i][1][n]) ) + "</td></tr>";
+						}
+						lmql = lmql + "</table></div>";
+					}
+					mQList.innerHTML = lmql;
+				}	
+			}
+			/*
+			<div class="mQuestion"> 
+					<div class="mQueTxt">Вопрос?</div>
+					<table border="0">
+						<tr><td>11111111111111111111</td></tr>
+						<tr class="mAnsOk"><td>dsa</td></tr>
+						<tr><td>dsa</td></tr>
+					</table>
+				</div>
+			*/
+			// mQListObj.checked = alert("ok");
+			
 			
 			function updateAnswer(byWhat, value) {
 				var printQuestion = "";

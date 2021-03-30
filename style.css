@@ -30,6 +30,10 @@ body {
 	.helpBlock .mAnswer {
 		font-size: 15pt;
 	}
+	
+	.mQueTxt, .mQuestion .mAnsOk {
+		font-size: 18pt !important;
+	}
 }
 
 .helpBlock {
@@ -123,4 +127,39 @@ body {
 	text-align: left;
 	background-color: #2969ff;
 	color: #ebf1ff;
+}
+
+.mQuestion {
+	display: block;
+	overflow: hidden;
+	width: 80%;
+	margin: 1em 0em;
+	border-radius: 0.8em;
+	font-family: Constantia, "Lucida Bright", "DejaVu Serif", Georgia, "serif";
+	text-align: left;
+	background: #fff;
+}
+
+.mQueTxt {
+	background: #223355;
+	color: white;
+	padding: 0.15em;
+	font-size: 16pt;
+}
+
+.mQuestion table {
+	width: 100%;
+	cellspacing: 0;
+}
+
+.mQuestion tr:nth-child(odd) {
+	background: #eee;
+}
+
+.mQuestion tr .mAnsOk {
+	background: #a0dba4;
+}
+
+.mQuestion tr:nth-child(odd) .mAnsOk {
+	background: #baffbe;
 }
