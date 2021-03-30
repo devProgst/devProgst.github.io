@@ -31,6 +31,10 @@ body {
 		font-size: 15pt;
 	}
 	
+	.mQuestion {
+		width: 100% !important;
+	}
+	
 	.mQueTxt, .mQuestion .mAnsOk {
 		font-size: 18pt !important;
 	}
