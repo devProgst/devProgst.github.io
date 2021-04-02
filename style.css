@@ -95,6 +95,16 @@ body {
 	outline: none;
 }
 
+.mButton2 {
+	height: 34pt;
+	padding: 0pt 10pt 0pt 5pt;
+	border-radius: 20pt;
+	text-align: center;
+	font-size: 18pt;
+	font-family: Cambria, "Hoefler Text", "Liberation Serif", Times, "Times New Roman", "serif";
+	outline: none;
+}
+
 .mAnswer {
 	font-family: Constantia, "Lucida Bright", "DejaVu Serif", Georgia, "serif";
 	font-size: 20pt;
@@ -166,4 +176,17 @@ body {
 
 .mQuestion tr:nth-child(odd) .mAnsOk {
 	background: #baffbe;
+}
+
+.mQuestion label {
+	display: inline-block;
+	width: 100%;
+}
+
+.mQueOk {
+	background: #afa !important;
+}
+
+.mQueBad {
+	background: #faa !important;
 }
