@@ -190,3 +190,27 @@ body {
 .mQueBad {
 	background: #faa !important;
 }
+
+
+.headBottom {
+	display: block;
+	overflow: visible;
+	position: relative;
+	background-image: url("img/hHeadB.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 200px;
+	height: 200px;
+	cursor: help;
+}
+
+.headTop {
+	display: block;
+	overflow: visible;
+	position: relative;
+	background-image: url("img/hHeadT.png");
+	background-repeat: no-repeat;
+	background-size: contain;
+	width: 200px;
+	height: 200px;
+}
